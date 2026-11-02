@@ -3477,7 +3477,7 @@ init();
     var email=$('lg-email').value.trim().toLowerCase();
     if(!sb)return fail('Can’t reach the login service. Refresh and try again.');
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail('Type your email above first, then tap Forgot password.');
-    run(Promise.resolve(sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname})).then(function(r){
+    run(Promise.resolve(sb.auth.resetPasswordForEmail(email,location.hostname==='localhost'?{}:{redirectTo:location.origin+location.pathname})).then(function(r){
       if(r.error)throw r.error;ok('Reset link sent. Check your email.');
     }));
   };
@@ -3494,7 +3494,7 @@ init();
     if(mode==='up'){
       if(!name)return fail('Tell us what to call you.');
       var opts={data:{name:name}};
-      if(/^https?:$/.test(location.protocol))opts.emailRedirectTo=location.origin+location.pathname;
+      if(/^https?:$/.test(location.protocol)&&location.hostname!=='localhost')opts.emailRedirectTo=location.origin+location.pathname;
       return run(Promise.resolve(sb.auth.signUp({email:email,password:pass,options:opts})).then(function(r){
         if(r.error)throw r.error;
         var u=r.data.user;

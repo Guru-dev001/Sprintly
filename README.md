@@ -1,27 +1,22 @@
-# Sprintly - GitHub setup
+# Sprintly - build the Android APK from GitHub
 
-## 1) Put the app online (GitHub Pages)
-1. Create a new GitHub repository (public is simplest) and upload everything in this folder
-   (keep the `.github` folder and `.nojekyll` file).
-2. Repo > Settings > Pages > Build and deployment > Source: **GitHub Actions**.
-3. Push to `main`. After ~1 minute your app is live at
-   `https://YOUR-USERNAME.github.io/YOUR-REPO/`
+No GitHub Pages or hosting needed. The app (index.html) is packed inside the APK.
 
-## 2) Supabase (needed for login to work on the new address)
-Supabase dashboard > Authentication > URL Configuration: add your GitHub Pages address
-to **Site URL** / **Redirect URLs**.
+1. Upload everything in this folder to your GitHub repo (keep the `.github` folder).
+2. Repo > Actions > **Build Android APK**. It runs by itself on every push to `main`,
+   or press **Run workflow**.
+3. When the run is green, open it and download **Sprintly-apk** (bottom of the page).
+   Unzip it and install `app-debug.apk` on your phone (allow "install unknown apps").
 
-## 3) Build the APK
-Repo > Actions > **Build Android APK** > Run workflow. When it finishes, download
-**Sprintly-apk** from the run page, unzip it, and install `app-debug.apk` on your phone
-(allow "install unknown apps").
+## Changing the app
+Edit `index.html` and commit. A new APK is built automatically. Install the new APK over
+the old one (the app updates itself only when you install the new APK).
 
-## 4) Updating the app later
-Edit `index.html` (or any file) and push. GitHub Pages redeploys, and the APK shows the new
-version the next time it is opened. You only rebuild the APK if you change the app name,
-icon or package id.
+## Login e-mails (Supabase)
+Inside the APK the app has no web address, so confirmation / reset e-mail links open
+your Supabase **Site URL** (Authentication > URL Configuration). Set that to any page you
+own (even a simple one). After tapping the link, go back to the app and sign in.
 
 ## Notes
-- The APK is a debug build, fine for your own phone. For Play Store you need a signed release build.
-- If you already have your own `sw.js` / `manifest.webmanifest` with push logic, keep yours.
-- Keep the same web address, because the APK points at it.
+- This is a debug APK, fine for your own phone. Play Store needs a signed release build.
+- Do not add a `pages.yml` workflow; it is not needed.
