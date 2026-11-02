@@ -1,0 +1,54 @@
+# Builds an installable Android APK that opens your live GitHub Pages site.
+# Because it loads the live site, app changes show up WITHOUT rebuilding the APK.
+# Run it from the Actions tab: "Build Android APK" > Run workflow.
+name: Build Android APK
+on:
+  workflow_dispatch:
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+
+      - name: Create Capacitor project that loads the live site
+        run: |
+          mkdir -p ../wrapper/www && cd ../wrapper
+          echo '<!doctype html><title>Sprintly</title>' > www/index.html
+          npm init -y >/dev/null
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          cat > capacitor.config.json <<JSON
+          {
+            "appId": "com.sprintly.app",
+            "appName": "Sprintly",
+            "webDir": "www",
+            "server": { "url": "$APP_URL", "cleartext": false }
+          }
+          JSON
+          npx cap add android
+          # launcher icon: use the app icon for every density
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            for n in ic_launcher ic_launcher_round ic_launcher_foreground; do
+              cp "$GITHUB_WORKSPACE/icon-512.png" "android/app/src/main/res/mipmap-$d/$n.png"
+            done
+          done
+
+      - name: Build APK
+        run: |
+          cd ../wrapper/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sprintly-apk
+          path: ../wrapper/android/app/build/outputs/apk/debug/app-debug.apk
