@@ -1104,8 +1104,9 @@ body.pl-lock{overflow:hidden;}
 :root,[data-theme="dark"]{--ink:#F2E9D5;--sh:#05060D;--bg:#161830;--surface:#232748;--surface2:#2E3358;--surface-hi:#232748;--border:rgba(242,233,213,.14);--text:#F4EDDC;--muted:#A9AECB;--accent:#FF8A3D;--accent2:#7DB7F2;--accent3:#F6C453;--fill:#F5802F;--on-fill:#14162B;--fill-grad:linear-gradient(#F5802F,#F5802F);--bar-grad:linear-gradient(#7DB7F2,#7DB7F2);--shadow:4px 4px 0 var(--sh);--radius:16px;}
 [data-theme="light"]{--ink:#1B1E33;--sh:#1B1E33;--bg:#F6EFDE;--surface:#FFFDF6;--surface2:#F1E8D2;--surface-hi:#FFFDF6;--border:rgba(27,30,51,.13);--text:#1B1E33;--muted:#5C6078;--accent:#E8641A;--accent2:#3E6FB0;--accent3:#F0B93B;--fill:#F5802F;--on-fill:#1B1E33;--fill-grad:linear-gradient(#F5802F,#F5802F);--bar-grad:linear-gradient(#7DB7F2,#7DB7F2);--shadow:4px 4px 0 var(--sh);--radius:16px;}
 body,button,input,select,textarea{font-family:'Roboto',system-ui,sans-serif;}
-/* Custom brand font: used automatically once /fonts/sprintly.woff2 exists */
-@font-face{font-family:'Sprintly';src:url('/fonts/sprintly.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
+/* Custom brand font: to use one, add fonts/sprintly.woff2 to the repo and uncomment (relative path, so it works on GitHub Pages sub-folders)
+@font-face{font-family:'Sprintly';src:url('fonts/sprintly.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
+*/
 /* Logo + headings: Sprintly (custom) > Fredoka Bold > Outfit ExtraBold */
 .title-block h1,.big-pct,.sp-title,.lg-brand h2,.wl-title,.modal-title,.cele-title{font-family:'Sprintly','Fredoka','Outfit','Archivo Black','Roboto',sans-serif!important;font-weight:700!important;font-stretch:112%;letter-spacing:.02em;}
 /* Extra-bold boost for the main title and splash name (Fredoka tops out at 700) */
