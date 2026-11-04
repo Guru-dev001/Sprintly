@@ -1,0 +1,8 @@
+{
+  "appId": "com.sprintly.app",
+  "appName": "Sprintly",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
