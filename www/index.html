@@ -1178,6 +1178,16 @@ html[data-theme] .nav-tab:hover:not(.active){border-color:var(--ink);color:var(-
 html[data-theme] .nav-tabs{display:flex;gap:8px;padding:14px 14px 4px;overflow:visible;}
 html[data-theme] .nav-tab{flex:1 1 0;min-width:0;padding:10px 4px;font-size:clamp(12px,4vw,16px);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media (min-width:860px){html[data-theme] .nav-tabs{max-width:560px;}}
+/* + button in the tab bar: quick-add a row */
+html[data-theme] .nav-tab.nav-add{flex:0 0 46px;padding:0;font-size:26px;font-weight:600;line-height:1;background:var(--fill);color:#fff;font-family:inherit;cursor:pointer;}
+html[data-theme] .nav-tab.nav-add.open{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shc);}
+.quick-add{display:flex;gap:8px;padding:10px 14px 4px;align-items:center;}
+.quick-add[hidden]{display:none;}
+.quick-add select,.quick-add input{min-width:0;height:40px;border:2px solid var(--ink);border-radius:99px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;font-weight:600;padding:0 12px;}
+.quick-add select{flex:0 1 44%;}
+.quick-add input{flex:1 1 auto;}
+.quick-add button{flex:0 0 auto;height:40px;padding:0 16px;border:2px solid var(--ink);border-radius:99px;background:var(--fill);color:#fff;font:inherit;font-size:14px;font-weight:800;box-shadow:3px 3px 0 var(--shc);cursor:pointer;}
+.quick-add button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shc);}
 
 /* Stats page: Overview / Week / Month / Year switch */
 .stats-seg{display:flex;gap:6px;padding:12px 16px 0;}
@@ -1573,6 +1583,12 @@ html[data-theme] .today-btn.show{
   <div class="nav-tab active" id="nav-period" role="button" tabindex="0" onclick="switchView('day')"><span id="nav-period-lbl">📅 Day</span></div>
   <div class="nav-tab" id="nav-planner" onclick="switchView('planner')">✦ Planner</div>
   <div class="nav-tab" id="nav-notes" onclick="switchView('notes')">📝 Notes</div>
+  <button class="nav-tab nav-add" id="nav-add" type="button" aria-label="Add a new row" aria-expanded="false">+</button>
+</div>
+<div class="quick-add" id="quick-add" hidden>
+  <select id="qa-sec" aria-label="Add to which tab"></select>
+  <input id="qa-text" type="text" maxlength="80" placeholder="New row…" enterkeyhint="done">
+  <button id="qa-go" type="button">Add</button>
 </div>
 
 <!-- ── DAY VIEW ── -->
@@ -1649,7 +1665,12 @@ html[data-theme] .today-btn.show{
 
   <div class="stats-sub" id="stats-sub-year">
     <div class="stats-row" id="year-stats-row"></div>
-    <div class="year-grid-wrap" id="year-grid-wrap"></div>
+    <div class="analytics-wrap">
+      <div class="analytics-card">
+        <div class="analytics-title">🍩 Day Quality + Category Scores</div>
+        <div class="spider-container" id="year-chart-wrap"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2256,7 +2277,12 @@ function renderSections(){
       showToast('Task added, Chief! ✦');
     };
     inp.onkeydown=(e)=>{if(e.key==='Enter') doAdd();};
+    const addBtn=document.createElement('button');
+    addBtn.className='add-task-btn';addBtn.type='button';
+    addBtn.setAttribute('aria-label','Add task to '+sec.label);addBtn.textContent='+';
+    addBtn.onclick=(e)=>{e.stopPropagation();doAdd();};
     addRow.appendChild(inp);
+    addRow.appendChild(addBtn);
     card.appendChild(addRow);
     cont.appendChild(card);
   });
@@ -2275,6 +2301,32 @@ function renderSections(){
   nameIn.onkeydown=e=>{if(e.key==='Enter')doAddSec();};
   cont.appendChild(addCard);
 }
+
+/* + button in the tab bar: add a row to any tab without scrolling */
+(function(){
+  const btn=document.getElementById('nav-add'),box=document.getElementById('quick-add');
+  const sel=document.getElementById('qa-sec'),txt=document.getElementById('qa-text'),go=document.getElementById('qa-go');
+  if(!btn||!box)return;
+  function fill(){
+    const keep=sel.value;sel.innerHTML='';
+    sections.forEach((sec,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(sec.icon||'')+' '+sec.label;sel.appendChild(o);});
+    if(keep&&sel.querySelector('option[value="'+keep+'"]'))sel.value=keep;
+  }
+  function setOpen(on){box.hidden=!on;btn.classList.toggle('open',on);btn.setAttribute('aria-expanded',on?'true':'false');btn.textContent=on?'×':'+';if(on){fill();setTimeout(()=>txt.focus(),30);}}
+  btn.onclick=()=>{ if(currentView!=='day')switchView('day'); setOpen(box.hidden); };
+  function add(){
+    const v=txt.value.trim();
+    if(!v){showToast('Type a row first');txt.focus();return;}
+    if(!sections.length){showToast('Add a tab first');return;}
+    const sid=parseInt(sel.value,10)||0;
+    sections[sid].habits.push(v);
+    saveSections();txt.value='';
+    renderSections();updateProgress();updateDayDots();
+    showToast('Row added, Chief! ✦');txt.focus();
+  }
+  go.onclick=add;
+  txt.onkeydown=e=>{if(e.key==='Enter')add();};
+})();
 
 function editHabit(sid,hid,item){
   if(item.classList.contains('editing')) return;
@@ -2627,24 +2679,53 @@ function renderYearView(){
     sr.innerHTML+=`<div class="stat-card"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`;
   });
 
-  const wrap=document.getElementById('year-grid-wrap');wrap.innerHTML='';
+  // Day-quality donut + per-category score bars (year to date)
+  const dayP=(dt)=>totalH?sections.reduce((a,s,sid)=>a+s.habits.filter((_,hid)=>ck(sid,hid,dateKey(dt))).length,0)/totalH:0;
+  let perfect=0,good=0,partial=0,missed=0,days=0;
+  const catDone=sections.map(()=>0),catPoss=sections.map(()=>0);
   for(let m=0;m<12;m++){
     const dim=new Date(year,m+1,0).getDate();
-    const block=document.createElement('div');block.className='year-month-block';
-    block.innerHTML=`<div class="year-month-label">${MONTHS_FULL[m]}</div>`;
-    const row=document.createElement('div');row.className='year-day-row';
     for(let d=1;d<=dim;d++){
-      const dt=new Date(year,m,d);
-      const isFuture=dt>now;
-      const p=getDayPct(dt);
-      const lvl=isFuture?'future':(p===0?'':p<26?'y1':p<51?'y2':p<100?'y3':'y4');
-      const cell=document.createElement('div');
-      cell.className='year-day '+(lvl||'');
-      cell.title=MONTHS[m]+' '+d+': '+p+'%';
-      row.appendChild(cell);
+      const dt=new Date(year,m,d);if(dt>now) break;
+      days++;
+      const p=dayP(dt);
+      if(p>=1) perfect++; else if(p>=0.7) good++; else if(p>0) partial++; else missed++;
+      const dk=dateKey(dt);
+      sections.forEach((sec,sid)=>{
+        catPoss[sid]+=sec.habits.length;
+        catDone[sid]+=sec.habits.filter((_,hid)=>ck(sid,hid,dk)).length;
+      });
     }
-    block.appendChild(row);wrap.appendChild(block);
   }
+  const segs=[['Perfect',perfect,'var(--fill)'],['Good 70%+',good,'var(--c3)'],['Partial',partial,'var(--c5)'],['Missed',missed,'var(--muted)']];
+  const cx=80,cy=80,r=56,sw=22;
+  let svg=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="${sw}"/>`;
+  let ang=-90;
+  segs.forEach(([n,v,c])=>{
+    if(!v||!days) return;
+    const a=v/days*360;
+    if(a>=359.9){ svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="${sw}"/>`; }
+    else{
+      const s0=ang*Math.PI/180,e0=(ang+a)*Math.PI/180;
+      svg+=`<path d="M${(cx+r*Math.cos(s0)).toFixed(2)},${(cy+r*Math.sin(s0)).toFixed(2)} A${r},${r} 0 ${a>180?1:0} 1 ${(cx+r*Math.cos(e0)).toFixed(2)},${(cy+r*Math.sin(e0)).toFixed(2)}" fill="none" stroke="${c}" stroke-width="${sw}"/>`;
+    }
+    ang+=a;
+  });
+  svg+=`<text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="24" font-weight="900" fill="var(--text)" font-family="Figtree,sans-serif">${days}</text>`+
+       `<text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="8" font-weight="800" fill="var(--muted)" font-family="Figtree,sans-serif">DAYS</text>`;
+  const catColors=['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)','var(--c6)','var(--c7)'];
+  let legend='';
+  segs.forEach(([n,v,c])=>{
+    legend+=`<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;margin:4px 0"><span style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></span>${n}<b style="margin-left:auto;color:var(--fill)">${v}</b></div>`;
+  });
+  let bars='';
+  sections.forEach((sec,sid)=>{
+    const p=catPoss[sid]?Math.round(catDone[sid]/catPoss[sid]*100):0;
+    bars+=`<div style="display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12px;font-weight:800"><span style="width:20px;flex-shrink:0">${esc(sec.icon)}</span><span style="width:104px;flex-shrink:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(sec.label)}</span><div style="flex:1;height:10px;border-radius:9px;background:var(--surface2);overflow:hidden"><div style="width:${p}%;height:100%;background:${catColors[sid%7]}"></div></div><b style="width:36px;text-align:right;flex-shrink:0">${p}%</b></div>`;
+  });
+  const wrap=document.getElementById('year-chart-wrap');
+  wrap.style.alignItems='stretch';
+  wrap.innerHTML=`<div style="display:flex;align-items:center;gap:14px;justify-content:center"><svg viewBox="0 0 160 160" width="150" height="150" style="flex-shrink:0">${svg}</svg><div style="flex:1;max-width:150px">${legend}</div></div><div style="width:100%;margin-top:6px">${bars||'<div style="color:var(--muted);font-size:13px;padding:8px">Add a tab to see category scores ✦</div>'}</div>`;
 }
 
 /* ── ANALYTICS VIEW ── */

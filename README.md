@@ -10,3 +10,9 @@ Your `index.html` wrapped with Capacitor. GitHub builds the APK for you.
 
 To change the app, edit `www/index.html` and commit; a new APK is built.
 Note: the app needs internet (it loads Supabase and Google Fonts online).
+
+## Permissions
+The build runs `scripts/lock-permissions.py`, which limits the app to
+**INTERNET** (sync with Supabase) and **VIBRATE** (alarms). Camera, location,
+contacts, storage, microphone, etc. are explicitly removed. The only prompt
+you may still see is the notification permission when you set an alarm.
