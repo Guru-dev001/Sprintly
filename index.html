@@ -1744,7 +1744,7 @@ html #welcome .wl-title{color:#161C28;}html #welcome .wl-title span{color:#DE3C3
 @keyframes barFill{to{width:100%;}}
 
 /* ═══ v17: rotary dial for the + button (top half out, bottom half hidden behind the bar) ═══ */
-#quick-add.quick-add{position:fixed !important;width:290px !important;height:290px !important;max-width:none !important;padding:0 !important;gap:0 !important;margin:0 !important;
+#quick-add.quick-add{position:fixed !important;width:246px !important;height:246px !important;max-width:none !important;padding:0 !important;gap:0 !important;margin:0 !important;
   transform:none !important;bottom:auto !important;background:none !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;display:block !important;
   z-index:55;clip-path:inset(0 0 calc(50% - 38px) 0);animation:dialIn .22s cubic-bezier(.2,.9,.3,1.1);}
 #quick-add.quick-add[hidden]{display:none !important;}
@@ -1758,7 +1758,7 @@ html #welcome .wl-title{color:#161C28;}html #welcome .wl-title span{color:#DE3C3
 
 /* ═══ v18: orbit dial, fixed navbar + hamburger ═══ */
 #quick-add.quick-add{touch-action:none;}
-#quick-add .qa-item{--hs:52px;}
+#quick-add .qa-item{--hs:42px;}
 /* navbar: never moves – ignore keyboard resize / overscroll stretch; hidden while typing */
 html,body{overscroll-behavior:none;}
 .bnav{bottom:max(12px,env(safe-area-inset-bottom,0px)) !important;}
@@ -1784,6 +1784,10 @@ html[data-theme] .strip-row .day-pill{position:relative;z-index:1;}
 /* a soft shade on the pills right next to the Today tab, so it reads as sitting above them */
 html[data-theme] .strip-row:has(.today-btn.show)::after{display:none !important;content:'';position:absolute;left:68px;top:12px;bottom:6px;width:16px;z-index:4;pointer-events:none;
   background:linear-gradient(to right,rgba(32,29,20,.22),rgba(32,29,20,0));border-radius:0 12px 12px 0;}
+</style>
+<style id="v23-align">
+/* v23: the tick boxes sit in one straight line under the category icon, and habit names line up with the category title */
+html[data-theme] .habit-item{padding-left:25.5px;gap:24px;}
 </style>
 </head>
 <body>
@@ -2770,14 +2774,14 @@ document.addEventListener('DOMContentLoaded',function(){
     layoutDial();
   }
   /* orbit: holes sit on a circle at a fixed spacing; the lower half is hidden under the bar. Adding a tab spins the orbit; drag to rotate */
-  const R=108;let rot=null,lastN=-1,raf=0;
+  const R=81,C=123;let rot=null,lastN=-1,raf=0;
   const stepOf=n=>n<=10?36:360/n;
   function items(){return [...circ.querySelectorAll('.qa-item')];}
   function homeRot(n){const s=stepOf(n);return n<=5?90+(n-1)/2*s:18+(n-1)*s;}   /* ≤5 centred, otherwise the + hole sits at the right end */
   function draw(r){
     const its=items(),s=stepOf(its.length);
     its.forEach((w,i)=>{
-      const a=(r-i*s)*Math.PI/180,x=145+R*Math.cos(a),y=145-R*Math.sin(a);
+      const a=(r-i*s)*Math.PI/180,x=C+R*Math.cos(a),y=C-R*Math.sin(a);
       w.style.left=x+'px';w.style.top=y+'px';
       w.style.visibility=Math.sin(a)<-.2?'hidden':'visible';
     });
@@ -2795,7 +2799,7 @@ document.addEventListener('DOMContentLoaded',function(){
   /* drag the orbit round with a finger */
   (function(){
     let drag=false,moved=0,prev=0;
-    const ang=e=>{const r=box.getBoundingClientRect();return Math.atan2(-(e.clientY-(r.top+145)),e.clientX-(r.left+145))*180/Math.PI;};
+    const ang=e=>{const r=box.getBoundingClientRect();return Math.atan2(-(e.clientY-(r.top+C)),e.clientX-(r.left+C))*180/Math.PI;};
     box.addEventListener('pointerdown',e=>{if(items().length<=5)return;drag=true;moved=0;prev=ang(e);cancelAnimationFrame(raf);});
     document.addEventListener('pointermove',e=>{if(!drag)return;const a=ang(e);let d=a-prev;if(d>180)d-=360;if(d<-180)d+=360;prev=a;moved+=Math.abs(d);rot+=d;draw(rot);});
     document.addEventListener('pointerup',()=>{if(!drag)return;drag=false;
@@ -2804,7 +2808,7 @@ document.addEventListener('DOMContentLoaded',function(){
   })();
   function placeDial(){
     const pl=btn.querySelector('.plus')||btn,r=pl.getBoundingClientRect();
-    box.style.left=Math.round(r.left+r.width/2-145)+'px';box.style.top=Math.round(r.top+r.height/2-145)+'px';
+    box.style.left=Math.round(r.left+r.width/2-C)+'px';box.style.top=Math.round(r.top+r.height/2-C)+'px';
   }
   window.addEventListener('resize',()=>{if(!box.hidden)placeDial();});
   function drawSw(interactive){
@@ -5395,6 +5399,43 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
     if(document.hidden){if(ready)push(false);}
     else{ready=false;pull().then(function(){ready=true;return push(false);});}
   });
+})();
+</script>
+<style id="v23-swipe">
+@keyframes statsSwL{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes statsSwR{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+.stats-sub.sw-l{animation:statsSwL .26s ease-out}
+.stats-sub.sw-r{animation:statsSwR .26s ease-out}
+@media (prefers-reduced-motion:reduce){.stats-sub.sw-l,.stats-sub.sw-r{animation:none}}
+</style>
+<script>
+/* Stats: swipe sideways to move between Overview / Week / Month / Year */
+(function(){
+  var panel=document.getElementById('panel-analytics'); if(!panel) return;
+  var ORDER=['overview','week','month','year'];
+  var x0=0,y0=0,t0=0,ok=false;
+  function hscroll(el){
+    while(el&&el!==panel){
+      if(el.scrollWidth>el.clientWidth+4){var ox=getComputedStyle(el).overflowX; if(ox==='auto'||ox==='scroll') return true;}
+      el=el.parentElement;
+    }
+    return false;
+  }
+  panel.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1){ok=false;return;}
+    var t=e.touches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+    ok=x0>24&&x0<window.innerWidth-24&&!hscroll(e.target);   /* leave the screen edges to Android's back gesture */
+  },{passive:true});
+  panel.addEventListener('touchend',function(e){
+    if(!ok) return; ok=false;
+    var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Date.now()-t0>700||Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6) return;
+    var i=ORDER.indexOf(statsSub), n=i+(dx<0?1:-1);
+    if(i<0||n<0||n>=ORDER.length) return;
+    setStatsSub(ORDER[n]);
+    var el=document.getElementById('stats-sub-'+ORDER[n]);
+    if(el){el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx<0?'sw-l':'sw-r');}
+  },{passive:true});
 })();
 </script>
 </body>
