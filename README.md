@@ -1,18 +1,21 @@
-# Sprintly – Android APK
+# Sprintly - build the signed Android update from GitHub
 
-Your `index.html` wrapped with Capacitor. GitHub builds the APK for you.
+This repo contains the Sprintly v19 app plus two home-screen widgets (Today's routine 3x2, Notes 2x2).
 
-## Steps
-1. Create a new GitHub repository.
-2. Upload ALL files from this folder (keep the `.github/workflows` folder and `www/` folder).
-3. Go to the **Actions** tab -> **Build Android APK** -> wait ~5 minutes (it also runs automatically on every push).
-4. Open the finished run -> **Artifacts** -> download **Sprintly-APK** (zip) -> unzip -> install `app-debug.apk` on your phone (allow "install unknown apps").
+## One-time setup: signing secrets (never put the key or password in the repo)
+1. On your computer, turn your key into text:
+   - Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("sprintly-release.p12")) | Set-Clipboard`
+   - Mac/Linux: `base64 -w0 sprintly-release.p12`
+2. GitHub repo > Settings > Secrets and variables > Actions > New repository secret:
+   - `SIGNING_KEYSTORE_BASE64` = the text from step 1
+   - `SIGNING_KEYSTORE_PASSWORD` = your key password (alias is `sprintly`)
 
-To change the app, edit `www/index.html` and commit; a new APK is built.
-Note: the app needs internet (it loads Supabase and Google Fonts online).
+## Build
+1. Upload everything in this folder to your repo (keep `.github`, `native`).
+2. Repo > Actions > **Build Android APK** > Run workflow.
+3. When green, download **Sprintly-apk** > `Sprintly-update.apk` and install it over v19.
+   It uses the same key as v19, so your data stays.
 
-## Permissions
-The build runs `scripts/lock-permissions.py`, which limits the app to
-**INTERNET** (sync with Supabase) and **VIBRATE** (alarms). Camera, location,
-contacts, storage, microphone, etc. are explicitly removed. The only prompt
-you may still see is the notification permission when you set an alarm.
+## Widgets
+Long-press the home screen > Widgets > Sprintly. Open the app once after updating so the widgets fill with your data.
+Tick/untick a habit or delete a note on the widget; the app applies it the next time it opens.

@@ -1,48 +1,90 @@
+# Builds the Sprintly Android update (v19 app + home-screen widgets) and signs it with YOUR release key.
+# Runs on every push to main, or manually: Actions > "Build Android APK" > Run workflow.
+# Download the result from the run page: Artifacts > Sprintly-apk  (file: Sprintly-update.apk)
+# Needs two repo secrets - see README.md: SIGNING_KEYSTORE_BASE64 and SIGNING_KEYSTORE_PASSWORD
 name: Build Android APK
-
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  build:
+  apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+      - uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync web files
-        run: npx cap sync android
-
-      - name: Lock permissions (INTERNET + VIBRATE only)
-        run: python3 scripts/lock-permissions.py
-
-      - name: Show final permissions
-        run: grep -n "uses-permission" android/app/src/main/AndroidManifest.xml
-
-      - name: Build debug APK
-        working-directory: android
+      - name: Create Capacitor project with the app inside
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          set -e
+          W="$RUNNER_TEMP/wrapper"
+          mkdir -p "$W/www"
+          cp index.html sw.js manifest.webmanifest icon-*.png "$W/www/"
+          cd "$W"
+          npm init -y >/dev/null
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/local-notifications@6
+          cat > capacitor.config.json <<'JSON'
+          {
+            "appId": "com.sprintly.app",
+            "appName": "Sprintly",
+            "webDir": "www",
+            "server": { "androidScheme": "https" },
+            "plugins": {
+              "LocalNotifications": { "smallIcon": "ic_stat_sprintly", "iconColor": "#DE3C31" }
+            }
+          }
+          JSON
+          npx cap add android
+          npx cap sync android
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+          A="$W/android/app/src/main"
+          # widgets (Java), bridge plugin and MainActivity that registers it
+          cp "$GITHUB_WORKSPACE"/native/java/*.java "$A/java/com/sprintly/app/"
+          # widget layouts, drawables, widget configs + notification icon
+          cp -r "$GITHUB_WORKSPACE"/native/res/. "$A/res/"
+          # launcher icons (the ones shipped in v19)
+          cp -r "$GITHUB_WORKSPACE"/native/launcher/. "$A/res/"
+          sed -i 's/#FFFFFF/#2A3646/I' "$A/res/values/ic_launcher_background.xml"
+          # widget receivers + notification permissions
+          python3 "$GITHUB_WORKSPACE/native/patch_manifest.py" "$A/AndroidManifest.xml"
+          # version must be higher than the installed v19 (versionCode 19)
+          sed -i "s/versionCode 1\$/versionCode $((100 + GITHUB_RUN_NUMBER))/; s/versionName \"1.0\"/versionName \"1.3.$GITHUB_RUN_NUMBER\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
+      - name: Build release APK
+        run: |
+          cd "$RUNNER_TEMP/wrapper/android"
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Sign APK with the release key
+        env:
+          KS_B64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+        run: |
+          set -e
+          if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ]; then
+            echo "::error::Add the SIGNING_KEYSTORE_BASE64 and SIGNING_KEYSTORE_PASSWORD repo secrets (see README.md)."
+            exit 1
+          fi
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          O="$RUNNER_TEMP/wrapper/android/app/build/outputs/apk/release"
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
+          "$BT/zipalign" -p -f 4 "$O/app-release-unsigned.apk" "$O/aligned.apk"
+          "$BT/apksigner" sign --ks "$RUNNER_TEMP/release.p12" --ks-type PKCS12 --ks-key-alias sprintly \
+            --ks-pass env:KS_PASS --out "$O/Sprintly-update.apk" "$O/aligned.apk"
+          "$BT/apksigner" verify --print-certs "$O/Sprintly-update.apk"
+          rm -f "$RUNNER_TEMP/release.p12"
+
+      - uses: actions/upload-artifact@v4
         with:
-          name: Sprintly-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: Sprintly-apk
+          path: ${{ runner.temp }}/wrapper/android/app/build/outputs/apk/release/Sprintly-update.apk

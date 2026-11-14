@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_bg" android:orientation="vertical" android:padding="12dp">
+
+    <LinearLayout android:id="@+id/ntitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Notes" android:textColor="#F3EEE6" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/ncount" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textColor="#8E99AB" android:textSize="10sp" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:orientation="vertical">
+        <LinearLayout android:id="@+id/nrow0" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:background="@drawable/widget_row_bg"
+            android:orientation="horizontal" android:paddingStart="9dp" android:paddingEnd="4dp"
+            android:paddingTop="5dp" android:paddingBottom="5dp">
+            <TextView android:id="@+id/ntxt0" android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:maxLines="2" android:ellipsize="end"
+                android:textColor="#F3EEE6" android:textSize="11sp" android:textStyle="bold" />
+            <TextView android:id="@+id/ndel0" android:layout_width="22dp" android:layout_height="wrap_content"
+                android:gravity="center" android:text="×" android:textColor="#8E99AB" android:textSize="14sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nrow1" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:background="@drawable/widget_row_bg"
+            android:orientation="horizontal" android:paddingStart="9dp" android:paddingEnd="4dp"
+            android:paddingTop="5dp" android:paddingBottom="5dp">
+            <TextView android:id="@+id/ntxt1" android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:maxLines="2" android:ellipsize="end"
+                android:textColor="#F3EEE6" android:textSize="11sp" android:textStyle="bold" />
+            <TextView android:id="@+id/ndel1" android:layout_width="22dp" android:layout_height="wrap_content"
+                android:gravity="center" android:text="×" android:textColor="#8E99AB" android:textSize="14sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nrow2" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:background="@drawable/widget_row_bg"
+            android:orientation="horizontal" android:paddingStart="9dp" android:paddingEnd="4dp"
+            android:paddingTop="5dp" android:paddingBottom="5dp">
+            <TextView android:id="@+id/ntxt2" android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:maxLines="2" android:ellipsize="end"
+                android:textColor="#F3EEE6" android:textSize="11sp" android:textStyle="bold" />
+            <TextView android:id="@+id/ndel2" android:layout_width="22dp" android:layout_height="wrap_content"
+                android:gravity="center" android:text="×" android:textColor="#8E99AB" android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView android:id="@+id/nadd" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" android:background="@drawable/widget_add_bg"
+        android:paddingStart="9dp" android:paddingTop="6dp" android:paddingBottom="6dp"
+        android:text="Add a note" android:textColor="#8E99AB" android:textSize="11sp" />
+</LinearLayout>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="widget_routine_desc">Today\'s routine checklist with progress and streak</string>
+    <string name="widget_notes_desc">Quick view of your latest notes</string>
+</resources>

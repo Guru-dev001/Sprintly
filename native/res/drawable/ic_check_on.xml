@@ -1,0 +1,10 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E8702A" />
+            <corners android:radius="6dp" />
+            <size android:width="18dp" android:height="18dp" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_tick" />
+</layer-list>
