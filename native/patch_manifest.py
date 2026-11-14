@@ -13,6 +13,8 @@ recv = '''
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/notes_widget_info" />
         </receiver>
+        <service android:name=".RoutineWidgetService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
+        <service android:name=".NotesWidgetService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
 '''
 assert "</application>" in s and "</manifest>" in s
 s = s.replace("</application>", recv + "    </application>", 1)

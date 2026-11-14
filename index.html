@@ -5325,8 +5325,25 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
    Keeps the native "Today's routine" (3x2) and "Notes" (2x2) widgets in sync with the app, and applies
    anything done on the widgets (ticking a habit, deleting a note) when the app opens. Does nothing in a browser. */
 (function(){
-  function W(){try{return window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SprintlyWidgets||null;}catch(_){return null;}}
+  var _P=null;
+  function W(){
+    if(_P) return _P;
+    try{
+      var C=window.Capacitor; if(!C) return null;
+      _P=(C.Plugins&&C.Plugins.SprintlyWidgets)||(typeof C.registerPlugin==='function'&&C.registerPlugin('SprintlyWidgets'))||null;
+    }catch(_){_P=null;}
+    return _P;
+  }
   if(!W()) return;
+  /* a tap on the Notes widget asks the app to open the Notes page (or start a new note) */
+  function applyOpen(){
+    var o=''; try{o=sessionStorage.getItem('sprintlyOpen')||''; sessionStorage.removeItem('sprintlyOpen');}catch(_){}
+    if(o!=='notes'&&o!=='notes_new') return;
+    try{
+      switchView('notes');
+      if(o==='notes_new') setTimeout(function(){var b=document.getElementById('notes-add'); if(b) b.click();},250);
+    }catch(_){}
+  }
   var NOTES_KEY=NS+'chiefNotesV1', last='', ready=false;
   function snap(){
     var dk=dateKey(new Date()), all=[], done=0;
@@ -5334,13 +5351,12 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
       var d=ck(sid,hid,dk); if(d) done++;
       all.push({t:String(h),d:d,d0:d,s:sid,h:hid});
     });});
-    var open=all.filter(function(x){return !x.d;}), shut=all.filter(function(x){return x.d;});
     var notes=[]; try{notes=JSON.parse(STORE.getItem(NOTES_KEY)||'[]');}catch(_){}
     if(!Array.isArray(notes)) notes=[];
     notes=notes.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(n){
       return {id:String(n.id),t:String(n.title||n.body||'Untitled').replace(/\s+/g,' ').slice(0,70)};
     });
-    return {dk:dk,total:all.length,done:done,streak:calcStreak(),routine:open.concat(shut).slice(0,4),notes:notes};
+    return {dk:dk,total:all.length,done:done,streak:calcStreak(),routine:all.slice(0,80),notes:notes};
   }
   function push(force){
     try{
@@ -5360,6 +5376,7 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
         });
         if(changed) save();
       }
+      if(r&&r.open){ try{sessionStorage.setItem('sprintlyOpen',r.open);}catch(_){} }
       var del=(r&&r.deleted)||[];
       if(del.length){
         var ns=[]; try{ns=JSON.parse(STORE.getItem(NOTES_KEY)||'[]');}catch(_){}
@@ -5369,6 +5386,7 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
         changed=true;
       }
       if(changed) return push(true).then(function(){location.reload();});
+      applyOpen();
     }).catch(function(){});
   }
   pull().then(function(){ready=true;return push(true);});
