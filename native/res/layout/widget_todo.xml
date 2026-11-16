@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_bg" android:orientation="vertical" android:padding="12dp">
+
+    <LinearLayout android:id="@+id/ttitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="To-do" android:textColor="#F3EEE6" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/tcount" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginStart="6dp" android:maxLines="1"
+            android:textColor="#8E99AB" android:textSize="11sp" />
+        <TextView android:id="@+id/tup" android:layout_width="26dp" android:layout_height="24dp"
+            android:gravity="center" android:text="\u25B2" android:textColor="#E8702A" android:textSize="12sp" />
+        <TextView android:id="@+id/tdown" android:layout_width="26dp" android:layout_height="24dp"
+            android:gravity="center" android:text="\u25BC" android:textColor="#E8702A" android:textSize="12sp" />
+    </LinearLayout>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="6dp">
+        <ListView android:id="@+id/tlist" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:divider="@null" android:dividerHeight="0dp" android:scrollbars="none"
+            android:listSelector="@android:color/transparent" android:cacheColorHint="@android:color/transparent" />
+        <TextView android:id="@+id/tempty" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:textColor="#8E99AB" android:textSize="11sp" />
+    </FrameLayout>
+
+    <TextView android:id="@+id/tadd" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" android:background="@drawable/widget_add_bg"
+        android:paddingStart="9dp" android:paddingTop="7dp" android:paddingBottom="7dp"
+        android:text="\uFF0B  Add a to-do" android:textColor="#E8702A" android:textSize="12sp" android:textStyle="bold" />
+</LinearLayout>

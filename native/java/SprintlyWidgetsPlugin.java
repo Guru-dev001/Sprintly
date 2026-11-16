@@ -14,9 +14,11 @@ public class SprintlyWidgetsPlugin extends Plugin {
     public void sync(PluginCall call) {
         JSArray routine = call.getArray("routine", new JSArray());
         JSArray notes = call.getArray("notes", new JSArray());
-        WidgetStore.save(getContext(), routine.toString(), notes.toString(),
+        JSArray todos = call.getArray("todos", new JSArray());
+        JSArray ack = call.getArray("ack", new JSArray());
+        WidgetStore.save(getContext(), routine.toString(), notes.toString(), todos.toString(),
             call.getInt("streak", 0), call.getInt("total", 0), call.getInt("done", 0),
-            call.getString("dk", ""));
+            call.getString("dk", ""), call.getString("tdk", ""), ack.toString());
         call.resolve();
     }
 

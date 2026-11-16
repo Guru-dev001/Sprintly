@@ -55,7 +55,7 @@ public class NotesWidget extends AppWidgetProvider {
         rv.setTextViewText(R.id.nempty, WidgetStore.synced(c) ? "No notes yet" : "Open Sprintly once to load your notes");
         rv.setPendingIntentTemplate(R.id.nlist, open(c, 300, "notes", true));
         rv.setOnClickPendingIntent(R.id.ntitle, open(c, 301, "notes", false));
-        rv.setOnClickPendingIntent(R.id.nadd, open(c, 302, "notes_new", false));
+        rv.setOnClickPendingIntent(R.id.nadd, TodoWidget.quickAdd(c, 302, "note"));
         rv.setOnClickPendingIntent(R.id.nup, scroll(c, 304, -1));
         rv.setOnClickPendingIntent(R.id.ndown, scroll(c, 305, 1));
         return rv;

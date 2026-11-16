@@ -13,6 +13,14 @@ recv = '''
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/notes_widget_info" />
         </receiver>
+        <receiver android:name=".TodoWidget" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/todo_widget_info" />
+        </receiver>
+        <service android:name=".TodoWidgetService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
+        <activity android:name=".QuickAddActivity" android:theme="@style/QuickAddTheme" android:exported="false"
+            android:excludeFromRecents="true" android:taskAffinity="" android:launchMode="singleTask"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <service android:name=".RoutineWidgetService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
         <service android:name=".NotesWidgetService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
 '''
