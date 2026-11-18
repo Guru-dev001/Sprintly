@@ -26,6 +26,7 @@ public class NotesWidgetService extends RemoteViewsService {
         Factory(Context c, int widgetId) { this.c = c; this.widgetId = widgetId; }
 
         @Override public void onCreate() {}
+        @Override public void onDestroy() {}
 
         @Override
         public void onDataSetChanged() {
