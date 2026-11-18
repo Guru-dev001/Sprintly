@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_bg" android:orientation="vertical" android:padding="12dp">
+
+    <LinearLayout android:id="@+id/ntitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Notes" android:textColor="#F3EEE6" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/ncount" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginStart="6dp" android:maxLines="1"
+            android:textColor="#8E99AB" android:textSize="11sp" />
+        <TextView android:id="@+id/nup" android:layout_width="26dp" android:layout_height="24dp"
+            android:gravity="center" android:text="\u25B2" android:textColor="#E8702A" android:textSize="12sp" />
+        <TextView android:id="@+id/ndown" android:layout_width="26dp" android:layout_height="24dp"
+            android:gravity="center" android:text="\u25BC" android:textColor="#E8702A" android:textSize="12sp" />
+    </LinearLayout>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="6dp">
+        <StackView android:id="@+id/nlist" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:loopViews="true" />
+        <TextView android:id="@+id/nempty" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:textColor="#8E99AB" android:textSize="11sp" />
+    </FrameLayout>
+
+    <TextView android:id="@+id/nadd" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" android:background="@drawable/widget_add_bg"
+        android:paddingStart="9dp" android:paddingTop="6dp" android:paddingBottom="6dp"
+        android:text="Add a note" android:textColor="#8E99AB" android:textSize="11sp" />
+</LinearLayout>
