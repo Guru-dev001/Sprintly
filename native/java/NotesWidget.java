@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import org.json.JSONArray;
 
-/** Notes - 2x2. Scrollable list; tapping a note (or the title / "Add a note") opens the Notes page in the app. */
+/** Notes - 2x2. Shows ONE note per page (title + content in a fixed space); swipe or use the arrows for the next note. Tapping a note opens the Notes page in the app. */
 public class NotesWidget extends AppWidgetProvider {
     public static final String ACTION_SCROLL = "com.sprintly.app.SCROLL_NOTES";
 
@@ -20,7 +20,7 @@ public class NotesWidget extends AppWidgetProvider {
             AppWidgetManager m = AppWidgetManager.getInstance(c);
             int[] ids = m.getAppWidgetIds(new ComponentName(c, NotesWidget.class));
             RemoteViews part = new RemoteViews(c.getPackageName(), R.layout.widget_notes);
-            part.setRelativeScrollPosition(R.id.nlist, i.getIntExtra("dir", 1));
+            if (i.getIntExtra("dir", 1) < 0) part.showPrevious(R.id.nlist); else part.showNext(R.id.nlist);
             m.partiallyUpdateAppWidget(ids, part);
         }
     }
@@ -32,8 +32,14 @@ public class NotesWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
-        for (int id : ids) m.updateAppWidget(id, build(c));
+        for (int id : ids) m.updateAppWidget(id, build(c, id));
         m.notifyAppWidgetViewDataChanged(ids, R.id.nlist);
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context c, AppWidgetManager m, int id, android.os.Bundle opts) {
+        m.updateAppWidget(id, build(c, id));
+        m.notifyAppWidgetViewDataChanged(id, R.id.nlist);
     }
 
     static PendingIntent open(Context c, int code, String target, boolean template) {
@@ -46,11 +52,14 @@ public class NotesWidget extends AppWidgetProvider {
         return PendingIntent.getActivity(c, code, i, flags);
     }
 
-    static RemoteViews build(Context c) {
+    static RemoteViews build(Context c, int widgetId) {
         RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_notes);
         JSONArray a = WidgetStore.arr(c, "notes");
         rv.setTextViewText(R.id.ncount, String.valueOf(a.length()));
-        rv.setRemoteAdapter(R.id.nlist, new Intent(c, NotesWidgetService.class));
+        Intent svc = new Intent(c, NotesWidgetService.class);
+        svc.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+        svc.setData(android.net.Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME)));
+        rv.setRemoteAdapter(R.id.nlist, svc);
         rv.setEmptyView(R.id.nlist, R.id.nempty);
         rv.setTextViewText(R.id.nempty, WidgetStore.synced(c) ? "No notes yet" : "Open Sprintly once to load your notes");
         rv.setPendingIntentTemplate(R.id.nlist, open(c, 300, "notes", true));

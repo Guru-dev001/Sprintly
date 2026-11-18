@@ -66,9 +66,13 @@ public final class WidgetStore {
     }
 
     private static JSONObject tempNote(JSONObject a) throws Exception {
-        String t = a.optString("t");
-        if (t.isEmpty()) t = a.optString("b").split("\n")[0];
-        return new JSONObject().put("id", a.optString("id")).put("t", t);
+        String t = a.optString("t"), b = a.optString("b");
+        if (t.isEmpty()) {
+            String[] ln = b.split("\n", 2);
+            t = ln[0];
+            b = ln.length > 1 ? ln[1] : "";
+        }
+        return new JSONObject().put("id", a.optString("id")).put("t", t).put("b", b);
     }
 
     private static JSONArray prepend(JSONArray old, JSONObject first) throws Exception {
@@ -145,7 +149,7 @@ public final class WidgetStore {
         for (int id : rids) m.updateAppWidget(id, RoutineWidget.build(c));
         if (rids.length > 0) m.notifyAppWidgetViewDataChanged(rids, R.id.rlist);
         int[] nids = m.getAppWidgetIds(new ComponentName(c, NotesWidget.class));
-        for (int id : nids) m.updateAppWidget(id, NotesWidget.build(c));
+        for (int id : nids) m.updateAppWidget(id, NotesWidget.build(c, id));
         if (nids.length > 0) m.notifyAppWidgetViewDataChanged(nids, R.id.nlist);
         int[] tids = m.getAppWidgetIds(new ComponentName(c, TodoWidget.class));
         for (int id : tids) m.updateAppWidget(id, TodoWidget.build(c));

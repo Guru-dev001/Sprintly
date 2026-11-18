@@ -1785,6 +1785,43 @@ html[data-theme] .strip-row .day-pill{position:relative;z-index:1;}
 html[data-theme] .strip-row:has(.today-btn.show)::after{display:none !important;content:'';position:absolute;left:68px;top:12px;bottom:6px;width:16px;z-index:4;pointer-events:none;
   background:linear-gradient(to right,rgba(32,29,20,.22),rgba(32,29,20,0));border-radius:0 12px 12px 0;}
 </style>
+<style id="sprintly-loader2">
+/* ── splash: calendar logo appears, then the "Sprintly" name stamps in ── */
+html #splash .sp-inner{display:flex;flex-direction:column;align-items:center;gap:24px !important;}
+#splash .sp-mark{width:min(32vw,128px);aspect-ratio:1/1;border-radius:22%;filter:drop-shadow(5px 5px 0 var(--shc,#201D14));opacity:0;
+  animation:spLogoIn .8s .2s cubic-bezier(.2,.8,.2,1) both;}
+#splash .sp-name{font:900 28px/1 'Figtree',sans-serif;color:#fff;background:var(--fill,#DE3C31);padding:8px 20px 10px;border-radius:14px;
+  border:2px solid var(--ink,#201D14);box-shadow:3px 3px 0 var(--shc,#201D14);opacity:0;transform-origin:50% 60%;
+  animation:spNameStamp .62s 1.2s cubic-bezier(.2,.9,.3,1.2) both;}
+@keyframes spLogoIn{0%{opacity:0;transform:scale(.85);}100%{opacity:1;transform:none;}}
+@keyframes spNameStamp{0%{opacity:0;transform:scale(3.2) rotate(-10deg);box-shadow:0 0 0 var(--shc,#201D14);}
+  55%{opacity:1;transform:scale(.92) rotate(2deg);box-shadow:1px 1px 0 var(--shc,#201D14);}
+  75%{opacity:1;transform:scale(1.04) rotate(-1deg);box-shadow:7px 7px 0 var(--shc,#201D14);}
+  100%{opacity:1;transform:none;box-shadow:3px 3px 0 var(--shc,#201D14);}}
+/* ── welcome screen: panda in the middle, "Welcome, name" + status + loading bar at the bottom ── */
+html #welcome{justify-content:flex-start;gap:8px;padding:24px 26px calc(34px + env(safe-area-inset-bottom,0px));}
+html #welcome .wl-art{margin-top:auto;margin-bottom:0;}
+html #welcome .wl-title{margin-top:auto;}
+html #welcome .wl-steps{width:100%;}
+html #welcome .sp-bar{width:100%;margin-top:6px;}
+/* ── notes: every card is the same size; tap a card to open it full screen ── */
+.notes-list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+.note-card{height:150px;cursor:pointer;overflow:hidden;gap:4px;-webkit-tap-highlight-color:transparent;}
+.note-card:active{transform:scale(.98);}
+.nc-title{flex:none;font-size:15px;font-weight:800;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nc-title.empty{color:var(--muted);}
+.nc-body{flex:1;min-height:0;font-size:13px;font-weight:600;line-height:1.45;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;white-space:pre-wrap;word-break:break-word;}
+.note-card .note-foot{flex:none;}
+.nv{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;gap:10px;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));}
+.nv[hidden]{display:none;}
+.nv-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.nv-back{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:9px 14px;font:900 13px 'Figtree',sans-serif;cursor:pointer;}
+.nv-date{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--muted);}
+.nv-del{background:none;border:0;color:var(--muted);font:800 12px 'Figtree',sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;padding:8px 6px;}
+.nv-title{flex:none;font-size:20px !important;font-weight:900 !important;padding:6px 0 !important;border-bottom:1px solid var(--border) !important;}
+.nv-body{flex:1;min-height:0 !important;overflow:auto !important;font-size:16px !important;}
+</style>
+
 <style id="v23-align">
 /* v23: the tick boxes sit in one straight line under the category icon, and habit names line up with the category title */
 html[data-theme] .habit-item{padding-left:25.5px;gap:24px;}
@@ -1805,8 +1842,8 @@ html[data-theme] .habit-item{padding-left:25.5px;gap:24px;}
 
 <div id="splash">
   <div class="sp-inner">
-    <div class="sp-art" role="img" aria-label="Sprintly - Habit &amp; Day Planner"></div>
-    <div class="sp-bar"><i></i></div>
+    <span class="logo-img sp-mark" role="img" aria-label="Sprintly"></span>
+    <div class="sp-name">Sprintly</div>
   </div>
 </div>
 
@@ -4445,24 +4482,64 @@ init();
     var d=new Date(ts); if(isNaN(d)) return '';
     return d.toLocaleDateString(undefined,{day:'numeric',month:'short'})+', '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
   }
-  function grow(t){ t.style.height='auto'; t.style.height=Math.max(84,t.scrollHeight)+'px'; }
   function find(id){ for(var i=0;i<notes.length;i++) if(notes[i].id===id) return notes[i]; return null; }
+  function remove(n){ notes=notes.filter(function(x){return x.id!==n.id;}); save(); }
+  /* ── full-screen note editor ── */
+  var view=null, vt=null, vb=null, vd=null, cur=null, pushed=false;
+  function ensureView(){
+    if(view) return;
+    view=document.createElement('div'); view.className='nv'; view.id='note-view'; view.hidden=true;
+    view.setAttribute('role','dialog'); view.setAttribute('aria-modal','true'); view.setAttribute('aria-label','Note');
+    var bar=document.createElement('div'); bar.className='nv-bar';
+    var back=document.createElement('button'); back.type='button'; back.className='nv-back'; back.textContent='\u2190 Back';
+    vd=document.createElement('span'); vd.className='nv-date';
+    var del=document.createElement('button'); del.type='button'; del.className='nv-del'; del.textContent='Delete';
+    bar.appendChild(back); bar.appendChild(vd); bar.appendChild(del);
+    vt=document.createElement('input'); vt.className='note-title nv-title'; vt.type='text'; vt.maxLength=80; vt.placeholder='Title'; vt.setAttribute('aria-label','Note title');
+    vb=document.createElement('textarea'); vb.className='note-body nv-body'; vb.placeholder='Write your note\u2026'; vb.setAttribute('aria-label','Note text');
+    view.appendChild(bar); view.appendChild(vt); view.appendChild(vb); document.body.appendChild(view);
+    function touch(){ if(!cur) return; cur.title=vt.value; cur.body=vb.value; cur.ts=Date.now(); vd.textContent=fmt(cur.ts); save(); }
+    vt.addEventListener('input',touch); vb.addEventListener('input',touch);
+    back.addEventListener('click',closeNote);
+    del.addEventListener('click',function(){
+      if(!cur) return;
+      if((cur.title||cur.body) && !window.confirm('Delete this note?')) return;
+      remove(cur); cur.title=''; cur.body=''; closeNote();
+    });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape' && cur) closeNote(); });
+    window.addEventListener('popstate',function(){ if(cur){ pushed=false; finish(); } });
+  }
+  function openNote(n){
+    ensureView(); cur=n; vt.value=n.title||''; vb.value=n.body||''; vd.textContent=fmt(n.ts);
+    view.hidden=false; document.documentElement.style.overflow='hidden';
+    try{ history.pushState({sprintlyNote:1},''); pushed=true; }catch(e){ pushed=false; }
+    if(!n.title&&!n.body) vt.focus();
+  }
+  function finish(){
+    if(!cur) return;
+    if(!cur.title && !cur.body) remove(cur);           // an empty new note is dropped
+    cur=null; view.hidden=true; document.documentElement.style.overflow=''; render();
+  }
+  function closeNote(){
+    if(!cur) return;
+    if(pushed){ pushed=false; try{ history.back(); }catch(e){} setTimeout(function(){ if(cur) finish(); },300); }
+    else finish();
+  }
+  /* ── card: fixed size, title + short preview; tap to open ── */
   function card(n){
-    var c=document.createElement('div'); c.className='note-card';
-    var t=document.createElement('input'); t.className='note-title'; t.type='text'; t.maxLength=80;
-    t.placeholder='Title'; t.value=n.title||''; t.setAttribute('aria-label','Note title');
-    var b=document.createElement('textarea'); b.className='note-body'; b.placeholder='Write your note…';
-    b.value=n.body||''; b.setAttribute('aria-label','Note text');
+    var c=document.createElement('div'); c.className='note-card'; c.tabIndex=0; c.setAttribute('role','button');
+    var t=document.createElement('div'); t.className='nc-title'+(n.title?'':' empty'); t.textContent=n.title||'Untitled';
+    var b=document.createElement('div'); b.className='nc-body'; b.textContent=n.body||'';
     var f=document.createElement('div'); f.className='note-foot';
     var dt=document.createElement('span'); dt.className='note-date'; dt.textContent=fmt(n.ts);
     var del=document.createElement('button'); del.type='button'; del.className='note-del'; del.textContent='Delete';
     f.appendChild(dt); f.appendChild(del); c.appendChild(t); c.appendChild(b); c.appendChild(f);
-    function touch(){ n.title=t.value; n.body=b.value; n.ts=Date.now(); dt.textContent=fmt(n.ts); save(); }
-    t.addEventListener('input',touch);
-    b.addEventListener('input',function(){ grow(b); touch(); });
-    del.addEventListener('click',function(){
+    c.addEventListener('click',function(){ openNote(n); });
+    c.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target===c){ e.preventDefault(); openNote(n); } });
+    del.addEventListener('click',function(e){
+      e.stopPropagation();
       if((n.title||n.body) && !window.confirm('Delete this note?')) return;
-      notes=notes.filter(function(x){return x.id!==n.id;}); save(); render();
+      remove(n); render();
     });
     return c;
   }
@@ -4477,7 +4554,7 @@ init();
       e.textContent=notes.length?'No notes match your search.':'No notes yet. Tap “+ New note” to jot something down.';
       list.appendChild(e); return;
     }
-    shown.forEach(function(n){ var c=card(n); list.appendChild(c); grow(c.querySelector('.note-body')); });
+    shown.forEach(function(n){ list.appendChild(card(n)); });
   }
   window.renderNotesView=render;
   window.__addNoteFromWidget=function(title,body){
@@ -4487,8 +4564,7 @@ init();
   document.getElementById('notes-add').addEventListener('click',function(){
     q=''; search.value='';
     var n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'',body:'',ts:Date.now()};
-    notes.unshift(n); save(); render();
-    var first=list.querySelector('.note-title'); if(first) first.focus();
+    notes.unshift(n); save(); render(); openNote(n);
   });
   search.addEventListener('input',function(){ q=search.value; render(); });
 })();
@@ -4500,7 +4576,7 @@ init();
     var splash=document.getElementById('splash'); if(!splash) return;
     if(document.documentElement.classList.contains('has-session')){ if(splash.parentNode) splash.parentNode.removeChild(splash); return; }
     var done=false, t0=null, loaded=(document.readyState==='complete'), timer=null, tries=0;
-    var HOLD=3300; // the last animation (underline) ends ~2.8s after the start; keep a short beat after it
+    var HOLD=2600; // the name stamp ends ~1.8s after the start; keep a short beat after it
     function hide(){
       if(done) return; done=true;
       splash.classList.add('hide');
@@ -5364,7 +5440,9 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
     var notes=[]; try{notes=JSON.parse(STORE.getItem(NOTES_KEY)||'[]');}catch(_){}
     if(!Array.isArray(notes)) notes=[];
     notes=notes.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(n){
-      return {id:String(n.id),t:String(n.title||n.body||'Untitled').replace(/\s+/g,' ').slice(0,70)};
+      var ti=String(n.title||'').replace(/\s+/g,' ').trim(), bo=String(n.body||'').replace(/[ \t]+/g,' ').trim();
+      if(!ti){ var ln=bo.split(/\n/); ti=(ln.shift()||'').trim()||'Untitled'; bo=ln.join('\n').trim(); }
+      return {id:String(n.id),t:ti.slice(0,70),b:bo.slice(0,400)};
     });
     var todos=[];
     try{(((plannerData[dk]||{}).todos)||[]).forEach(function(t){

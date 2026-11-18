@@ -5,15 +5,15 @@ perms = ["android.permission.POST_NOTIFICATIONS", "android.permission.SCHEDULE_E
          "android.permission.USE_EXACT_ALARM", "android.permission.RECEIVE_BOOT_COMPLETED"]
 add = "".join('    <uses-permission android:name="%s" />\n' % x for x in perms if x not in s)
 recv = '''
-        <receiver android:name=".RoutineWidget" android:exported="false">
+        <receiver android:name=".RoutineWidget" android:label="@string/widget_routine_name" android:exported="false">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/routine_widget_info" />
         </receiver>
-        <receiver android:name=".NotesWidget" android:exported="false">
+        <receiver android:name=".NotesWidget" android:label="@string/widget_notes_name" android:exported="false">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/notes_widget_info" />
         </receiver>
-        <receiver android:name=".TodoWidget" android:exported="false">
+        <receiver android:name=".TodoWidget" android:label="@string/widget_todo_name" android:exported="false">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/todo_widget_info" />
         </receiver>
