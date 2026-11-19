@@ -1,4 +1,8 @@
 <resources>
+    <string name="widget_routine_name">Sprintly Routine</string>
+    <string name="widget_notes_name">Sprintly Notes</string>
+    <string name="widget_todo_name">Sprintly To-do</string>
     <string name="widget_routine_desc">Today\'s routine checklist with progress and streak</string>
-    <string name="widget_notes_desc">Quick view of your latest notes</string>
+    <string name="widget_notes_desc">Your notes, one at a time - swipe to see the next one</string>
+    <string name="widget_todo_desc">Your to-do list - resizable, scrollable, add tasks right here</string>
 </resources>

@@ -1744,7 +1744,7 @@ html #welcome .wl-title{color:#161C28;}html #welcome .wl-title span{color:#DE3C3
 @keyframes barFill{to{width:100%;}}
 
 /* ═══ v17: rotary dial for the + button (top half out, bottom half hidden behind the bar) ═══ */
-#quick-add.quick-add{position:fixed !important;width:290px !important;height:290px !important;max-width:none !important;padding:0 !important;gap:0 !important;margin:0 !important;
+#quick-add.quick-add{position:fixed !important;width:246px !important;height:246px !important;max-width:none !important;padding:0 !important;gap:0 !important;margin:0 !important;
   transform:none !important;bottom:auto !important;background:none !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;display:block !important;
   z-index:55;clip-path:inset(0 0 calc(50% - 38px) 0);animation:dialIn .22s cubic-bezier(.2,.9,.3,1.1);}
 #quick-add.quick-add[hidden]{display:none !important;}
@@ -1758,7 +1758,7 @@ html #welcome .wl-title{color:#161C28;}html #welcome .wl-title span{color:#DE3C3
 
 /* ═══ v18: orbit dial, fixed navbar + hamburger ═══ */
 #quick-add.quick-add{touch-action:none;}
-#quick-add .qa-item{--hs:52px;}
+#quick-add .qa-item{--hs:42px;}
 /* navbar: never moves – ignore keyboard resize / overscroll stretch; hidden while typing */
 html,body{overscroll-behavior:none;}
 .bnav{bottom:max(12px,env(safe-area-inset-bottom,0px)) !important;}
@@ -1785,6 +1785,47 @@ html[data-theme] .strip-row .day-pill{position:relative;z-index:1;}
 html[data-theme] .strip-row:has(.today-btn.show)::after{display:none !important;content:'';position:absolute;left:68px;top:12px;bottom:6px;width:16px;z-index:4;pointer-events:none;
   background:linear-gradient(to right,rgba(32,29,20,.22),rgba(32,29,20,0));border-radius:0 12px 12px 0;}
 </style>
+<style id="sprintly-loader2">
+/* ── splash: calendar logo appears, then the "Sprintly" name stamps in ── */
+html #splash .sp-inner{display:flex;flex-direction:column;align-items:center;gap:24px !important;}
+#splash .sp-mark{width:min(32vw,128px);aspect-ratio:1/1;border-radius:22%;filter:drop-shadow(5px 5px 0 var(--shc,#201D14));opacity:0;
+  animation:spLogoIn .8s .2s cubic-bezier(.2,.8,.2,1) both;}
+#splash .sp-name{font:900 28px/1 'Figtree',sans-serif;color:#fff;background:var(--fill,#DE3C31);padding:8px 20px 10px;border-radius:14px;
+  border:2px solid var(--ink,#201D14);box-shadow:3px 3px 0 var(--shc,#201D14);opacity:0;transform-origin:50% 60%;
+  animation:spNameStamp .62s 1.2s cubic-bezier(.2,.9,.3,1.2) both;}
+@keyframes spLogoIn{0%{opacity:0;transform:scale(.85);}100%{opacity:1;transform:none;}}
+@keyframes spNameStamp{0%{opacity:0;transform:scale(3.2) rotate(-10deg);box-shadow:0 0 0 var(--shc,#201D14);}
+  55%{opacity:1;transform:scale(.92) rotate(2deg);box-shadow:1px 1px 0 var(--shc,#201D14);}
+  75%{opacity:1;transform:scale(1.04) rotate(-1deg);box-shadow:7px 7px 0 var(--shc,#201D14);}
+  100%{opacity:1;transform:none;box-shadow:3px 3px 0 var(--shc,#201D14);}}
+/* ── welcome screen: panda in the middle, "Welcome, name" + status + loading bar at the bottom ── */
+html #welcome{justify-content:flex-start;gap:8px;padding:24px 26px calc(34px + env(safe-area-inset-bottom,0px));}
+html #welcome .wl-art{margin-top:auto;margin-bottom:0;}
+html #welcome .wl-title{margin-top:auto;}
+html #welcome .wl-steps{width:100%;}
+html #welcome .sp-bar{width:100%;margin-top:6px;}
+/* ── notes: every card is the same size; tap a card to open it full screen ── */
+.notes-list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+.note-card{height:150px;cursor:pointer;overflow:hidden;gap:4px;-webkit-tap-highlight-color:transparent;}
+.note-card:active{transform:scale(.98);}
+.nc-title{flex:none;font-size:15px;font-weight:800;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nc-title.empty{color:var(--muted);}
+.nc-body{flex:1;min-height:0;font-size:13px;font-weight:600;line-height:1.45;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;white-space:pre-wrap;word-break:break-word;}
+.note-card .note-foot{flex:none;}
+.nv{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;gap:10px;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));}
+.nv[hidden]{display:none;}
+.nv-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.nv-back{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:9px 14px;font:900 13px 'Figtree',sans-serif;cursor:pointer;}
+.nv-date{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--muted);}
+.nv-del{background:none;border:0;color:var(--muted);font:800 12px 'Figtree',sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;padding:8px 6px;}
+.nv-title{flex:none;font-size:20px !important;font-weight:900 !important;padding:6px 0 !important;border-bottom:1px solid var(--border) !important;}
+.nv-body{flex:1;min-height:0 !important;overflow:auto !important;font-size:16px !important;}
+</style>
+
+<style id="v23-align">
+/* v23: the tick boxes sit in one straight line under the category icon, and habit names line up with the category title */
+html[data-theme] .habit-item{padding-left:25.5px;gap:24px;}
+</style>
 </head>
 <body>
 
@@ -1801,8 +1842,8 @@ html[data-theme] .strip-row:has(.today-btn.show)::after{display:none !important;
 
 <div id="splash">
   <div class="sp-inner">
-    <div class="sp-art" role="img" aria-label="Sprintly - Habit &amp; Day Planner"></div>
-    <div class="sp-bar"><i></i></div>
+    <span class="logo-img sp-mark" role="img" aria-label="Sprintly"></span>
+    <div class="sp-name">Sprintly</div>
   </div>
 </div>
 
@@ -2770,14 +2811,14 @@ document.addEventListener('DOMContentLoaded',function(){
     layoutDial();
   }
   /* orbit: holes sit on a circle at a fixed spacing; the lower half is hidden under the bar. Adding a tab spins the orbit; drag to rotate */
-  const R=108;let rot=null,lastN=-1,raf=0;
+  const R=81,C=123;let rot=null,lastN=-1,raf=0;
   const stepOf=n=>n<=10?36:360/n;
   function items(){return [...circ.querySelectorAll('.qa-item')];}
   function homeRot(n){const s=stepOf(n);return n<=5?90+(n-1)/2*s:18+(n-1)*s;}   /* ≤5 centred, otherwise the + hole sits at the right end */
   function draw(r){
     const its=items(),s=stepOf(its.length);
     its.forEach((w,i)=>{
-      const a=(r-i*s)*Math.PI/180,x=145+R*Math.cos(a),y=145-R*Math.sin(a);
+      const a=(r-i*s)*Math.PI/180,x=C+R*Math.cos(a),y=C-R*Math.sin(a);
       w.style.left=x+'px';w.style.top=y+'px';
       w.style.visibility=Math.sin(a)<-.2?'hidden':'visible';
     });
@@ -2795,7 +2836,7 @@ document.addEventListener('DOMContentLoaded',function(){
   /* drag the orbit round with a finger */
   (function(){
     let drag=false,moved=0,prev=0;
-    const ang=e=>{const r=box.getBoundingClientRect();return Math.atan2(-(e.clientY-(r.top+145)),e.clientX-(r.left+145))*180/Math.PI;};
+    const ang=e=>{const r=box.getBoundingClientRect();return Math.atan2(-(e.clientY-(r.top+C)),e.clientX-(r.left+C))*180/Math.PI;};
     box.addEventListener('pointerdown',e=>{if(items().length<=5)return;drag=true;moved=0;prev=ang(e);cancelAnimationFrame(raf);});
     document.addEventListener('pointermove',e=>{if(!drag)return;const a=ang(e);let d=a-prev;if(d>180)d-=360;if(d<-180)d+=360;prev=a;moved+=Math.abs(d);rot+=d;draw(rot);});
     document.addEventListener('pointerup',()=>{if(!drag)return;drag=false;
@@ -2804,7 +2845,7 @@ document.addEventListener('DOMContentLoaded',function(){
   })();
   function placeDial(){
     const pl=btn.querySelector('.plus')||btn,r=pl.getBoundingClientRect();
-    box.style.left=Math.round(r.left+r.width/2-145)+'px';box.style.top=Math.round(r.top+r.height/2-145)+'px';
+    box.style.left=Math.round(r.left+r.width/2-C)+'px';box.style.top=Math.round(r.top+r.height/2-C)+'px';
   }
   window.addEventListener('resize',()=>{if(!box.hidden)placeDial();});
   function drawSw(interactive){
@@ -4441,24 +4482,64 @@ init();
     var d=new Date(ts); if(isNaN(d)) return '';
     return d.toLocaleDateString(undefined,{day:'numeric',month:'short'})+', '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
   }
-  function grow(t){ t.style.height='auto'; t.style.height=Math.max(84,t.scrollHeight)+'px'; }
   function find(id){ for(var i=0;i<notes.length;i++) if(notes[i].id===id) return notes[i]; return null; }
+  function remove(n){ notes=notes.filter(function(x){return x.id!==n.id;}); save(); }
+  /* ── full-screen note editor ── */
+  var view=null, vt=null, vb=null, vd=null, cur=null, pushed=false;
+  function ensureView(){
+    if(view) return;
+    view=document.createElement('div'); view.className='nv'; view.id='note-view'; view.hidden=true;
+    view.setAttribute('role','dialog'); view.setAttribute('aria-modal','true'); view.setAttribute('aria-label','Note');
+    var bar=document.createElement('div'); bar.className='nv-bar';
+    var back=document.createElement('button'); back.type='button'; back.className='nv-back'; back.textContent='\u2190 Back';
+    vd=document.createElement('span'); vd.className='nv-date';
+    var del=document.createElement('button'); del.type='button'; del.className='nv-del'; del.textContent='Delete';
+    bar.appendChild(back); bar.appendChild(vd); bar.appendChild(del);
+    vt=document.createElement('input'); vt.className='note-title nv-title'; vt.type='text'; vt.maxLength=80; vt.placeholder='Title'; vt.setAttribute('aria-label','Note title');
+    vb=document.createElement('textarea'); vb.className='note-body nv-body'; vb.placeholder='Write your note\u2026'; vb.setAttribute('aria-label','Note text');
+    view.appendChild(bar); view.appendChild(vt); view.appendChild(vb); document.body.appendChild(view);
+    function touch(){ if(!cur) return; cur.title=vt.value; cur.body=vb.value; cur.ts=Date.now(); vd.textContent=fmt(cur.ts); save(); }
+    vt.addEventListener('input',touch); vb.addEventListener('input',touch);
+    back.addEventListener('click',closeNote);
+    del.addEventListener('click',function(){
+      if(!cur) return;
+      if((cur.title||cur.body) && !window.confirm('Delete this note?')) return;
+      remove(cur); cur.title=''; cur.body=''; closeNote();
+    });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape' && cur) closeNote(); });
+    window.addEventListener('popstate',function(){ if(cur){ pushed=false; finish(); } });
+  }
+  function openNote(n){
+    ensureView(); cur=n; vt.value=n.title||''; vb.value=n.body||''; vd.textContent=fmt(n.ts);
+    view.hidden=false; document.documentElement.style.overflow='hidden';
+    try{ history.pushState({sprintlyNote:1},''); pushed=true; }catch(e){ pushed=false; }
+    if(!n.title&&!n.body) vt.focus();
+  }
+  function finish(){
+    if(!cur) return;
+    if(!cur.title && !cur.body) remove(cur);           // an empty new note is dropped
+    cur=null; view.hidden=true; document.documentElement.style.overflow=''; render();
+  }
+  function closeNote(){
+    if(!cur) return;
+    if(pushed){ pushed=false; try{ history.back(); }catch(e){} setTimeout(function(){ if(cur) finish(); },300); }
+    else finish();
+  }
+  /* ── card: fixed size, title + short preview; tap to open ── */
   function card(n){
-    var c=document.createElement('div'); c.className='note-card';
-    var t=document.createElement('input'); t.className='note-title'; t.type='text'; t.maxLength=80;
-    t.placeholder='Title'; t.value=n.title||''; t.setAttribute('aria-label','Note title');
-    var b=document.createElement('textarea'); b.className='note-body'; b.placeholder='Write your note…';
-    b.value=n.body||''; b.setAttribute('aria-label','Note text');
+    var c=document.createElement('div'); c.className='note-card'; c.tabIndex=0; c.setAttribute('role','button');
+    var t=document.createElement('div'); t.className='nc-title'+(n.title?'':' empty'); t.textContent=n.title||'Untitled';
+    var b=document.createElement('div'); b.className='nc-body'; b.textContent=n.body||'';
     var f=document.createElement('div'); f.className='note-foot';
     var dt=document.createElement('span'); dt.className='note-date'; dt.textContent=fmt(n.ts);
     var del=document.createElement('button'); del.type='button'; del.className='note-del'; del.textContent='Delete';
     f.appendChild(dt); f.appendChild(del); c.appendChild(t); c.appendChild(b); c.appendChild(f);
-    function touch(){ n.title=t.value; n.body=b.value; n.ts=Date.now(); dt.textContent=fmt(n.ts); save(); }
-    t.addEventListener('input',touch);
-    b.addEventListener('input',function(){ grow(b); touch(); });
-    del.addEventListener('click',function(){
+    c.addEventListener('click',function(){ openNote(n); });
+    c.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target===c){ e.preventDefault(); openNote(n); } });
+    del.addEventListener('click',function(e){
+      e.stopPropagation();
       if((n.title||n.body) && !window.confirm('Delete this note?')) return;
-      notes=notes.filter(function(x){return x.id!==n.id;}); save(); render();
+      remove(n); render();
     });
     return c;
   }
@@ -4473,14 +4554,17 @@ init();
       e.textContent=notes.length?'No notes match your search.':'No notes yet. Tap “+ New note” to jot something down.';
       list.appendChild(e); return;
     }
-    shown.forEach(function(n){ var c=card(n); list.appendChild(c); grow(c.querySelector('.note-body')); });
+    shown.forEach(function(n){ list.appendChild(card(n)); });
   }
   window.renderNotesView=render;
+  window.__addNoteFromWidget=function(title,body){
+    var n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:String(title||''),body:String(body||''),ts:Date.now()};
+    notes.unshift(n); save(); render();
+  };
   document.getElementById('notes-add').addEventListener('click',function(){
     q=''; search.value='';
     var n={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'',body:'',ts:Date.now()};
-    notes.unshift(n); save(); render();
-    var first=list.querySelector('.note-title'); if(first) first.focus();
+    notes.unshift(n); save(); render(); openNote(n);
   });
   search.addEventListener('input',function(){ q=search.value; render(); });
 })();
@@ -4492,7 +4576,7 @@ init();
     var splash=document.getElementById('splash'); if(!splash) return;
     if(document.documentElement.classList.contains('has-session')){ if(splash.parentNode) splash.parentNode.removeChild(splash); return; }
     var done=false, t0=null, loaded=(document.readyState==='complete'), timer=null, tries=0;
-    var HOLD=3300; // the last animation (underline) ends ~2.8s after the start; keep a short beat after it
+    var HOLD=2600; // the name stamp ends ~1.8s after the start; keep a short beat after it
     function hide(){
       if(done) return; done=true;
       splash.classList.add('hide');
@@ -5322,8 +5406,10 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
 </script>
 <script>
 /* ── Sprintly home-screen widgets ──
-   Keeps the native "Today's routine" (3x2) and "Notes" (2x2) widgets in sync with the app, and applies
-   anything done on the widgets (ticking a habit, deleting a note) when the app opens. Does nothing in a browser. */
+   Two-way link with the Today's routine, To-do and Notes widgets:
+   - the app keeps the widgets up to date (a few seconds after any change, and when you leave the app)
+   - ticks made on the widgets and items typed on them are applied here when the app opens or comes back.
+   Does nothing in a browser. */
 (function(){
   var _P=null;
   function W(){
@@ -5335,16 +5421,16 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
     return _P;
   }
   if(!W()) return;
-  /* a tap on the Notes widget asks the app to open the Notes page (or start a new note) */
-  function applyOpen(){
-    var o=''; try{o=sessionStorage.getItem('sprintlyOpen')||''; sessionStorage.removeItem('sprintlyOpen');}catch(_){}
-    if(o!=='notes'&&o!=='notes_new') return;
+  var NOTES_KEY=NS+'chiefNotesV1', APPLIED_KEY=NS+'widgetApplied', last='', ready=false, pulling=false;
+  function appliedGet(){try{return JSON.parse(STORE.getItem(APPLIED_KEY)||'[]')||[];}catch(_){return [];}}
+  function appliedPut(a){try{STORE.setItem(APPLIED_KEY,JSON.stringify(a.slice(-60)));}catch(_){}}
+  function goTo(o){
+    if(o!=='notes'&&o!=='notes_new'&&o!=='todo') return;
     try{
-      switchView('notes');
+      if(o==='todo') switchView('planner'); else switchView('notes');
       if(o==='notes_new') setTimeout(function(){var b=document.getElementById('notes-add'); if(b) b.click();},250);
     }catch(_){}
   }
-  var NOTES_KEY=NS+'chiefNotesV1', last='', ready=false;
   function snap(){
     var dk=dateKey(new Date()), all=[], done=0;
     sections.forEach(function(s,sid){(s.habits||[]).forEach(function(h,hid){
@@ -5354,47 +5440,113 @@ html.kb-typing .hero,html.kb-typing .prog-pin,html.kb-typing .sticky-top,html.kb
     var notes=[]; try{notes=JSON.parse(STORE.getItem(NOTES_KEY)||'[]');}catch(_){}
     if(!Array.isArray(notes)) notes=[];
     notes=notes.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(n){
-      return {id:String(n.id),t:String(n.title||n.body||'Untitled').replace(/\s+/g,' ').slice(0,70)};
+      var ti=String(n.title||'').replace(/\s+/g,' ').trim(), bo=String(n.body||'').replace(/[ \t]+/g,' ').trim();
+      if(!ti){ var ln=bo.split(/\n/); ti=(ln.shift()||'').trim()||'Untitled'; bo=ln.join('\n').trim(); }
+      return {id:String(n.id),t:ti.slice(0,70),b:bo.slice(0,400)};
     });
-    return {dk:dk,total:all.length,done:done,streak:calcStreak(),routine:all.slice(0,80),notes:notes};
+    var todos=[];
+    try{(((plannerData[dk]||{}).todos)||[]).forEach(function(t){
+      todos.push({id:String(t.id),t:String(t.title||'').slice(0,80),d:!!t.checked,d0:!!t.checked,p:t.priority||'med'});
+    });}catch(_){}
+    return {dk:dk,tdk:dk,total:all.length,done:done,streak:calcStreak(),routine:all.slice(0,80),notes:notes,todos:todos.slice(0,80)};
   }
-  function push(force){
+  function push(force,ack){
     try{
-      var s=snap(), j=JSON.stringify(s);
+      var s=snap(); if(ack&&ack.length) s.ack=ack;
+      var j=JSON.stringify(s);
       if(!force&&j===last) return Promise.resolve();
       last=j; return W().sync(s);
     }catch(_){return Promise.resolve();}
   }
   function pull(){
+    if(pulling) return Promise.resolve(); pulling=true;
     return W().pull().then(function(r){
-      var changed=false, dk=r&&r.dk;
+      r=r||{};
+      var redraw=false, plannerChanged=false, notesChanged=false, dk=r.dk, tdk=r.tdk||r.dk, ack=[];
+      /* 1. habits ticked on the routine widget */
       if(dk&&editStatus(dk)==='ok'){
         (r.routine||[]).forEach(function(it){
-          if(typeof it.s==='number'&&!!it.d!==!!it.d0&&sections[it.s]){
-            state[it.s+'_'+it.h+'_'+dk]=!!it.d; changed=true;
-          }
+          if(typeof it.s==='number'&&!!it.d!==!!it.d0&&sections[it.s]){ state[it.s+'_'+it.h+'_'+dk]=!!it.d; redraw=true; }
         });
-        if(changed) save();
+        if(redraw) save();
       }
-      if(r&&r.open){ try{sessionStorage.setItem('sprintlyOpen',r.open);}catch(_){} }
-      var del=(r&&r.deleted)||[];
-      if(del.length){
-        var ns=[]; try{ns=JSON.parse(STORE.getItem(NOTES_KEY)||'[]');}catch(_){}
-        ns=ns.filter(function(n){return del.indexOf(String(n.id))<0;});
-        try{STORE.setItem(NOTES_KEY,JSON.stringify(ns));}catch(_){}
-        try{cloudPush('chiefNotesV1');}catch(_){}
-        changed=true;
+      /* 2. things typed on the widgets (each one only once) */
+      var done=appliedGet(), tmp={};
+      (r.todos||[]).forEach(function(it){tmp[String(it.id)]=it;});
+      (r.adds||[]).forEach(function(a){
+        var id=String(a.id); ack.push(id);
+        if(done.indexOf(id)>=0) return;
+        done.push(id);
+        if(a.k==='todo'&&tdk){
+          ensurePlannerDate(tdk); var ti=tmp[id];
+          plannerData[tdk].todos.push({id:newId(),title:String(a.t||a.b||'').slice(0,120),note:'',priority:'med',tag:'other',checked:!!(ti&&ti.d)});
+          plannerChanged=true;
+        }else if(a.k==='note'&&window.__addNoteFromWidget){
+          window.__addNoteFromWidget(a.t,a.b); notesChanged=true;
+        }
+      });
+      appliedPut(done);
+      /* 3. to-dos ticked on the to-do widget */
+      (r.todos||[]).forEach(function(it){
+        if(String(it.id).indexOf('w~')===0||!!it.d===!!it.d0||!tdk) return;
+        var arr=((plannerData[tdk]||{}).todos)||[];
+        for(var i=0;i<arr.length;i++) if(String(arr[i].id)===String(it.id)){arr[i].checked=!!it.d; plannerChanged=true;}
+      });
+      if(plannerChanged) savePlanner();
+      /* 4. redraw in place (no reload) */
+      if(redraw||plannerChanged||notesChanged){
+        try{renderSections();updateProgress();updateDayDots();}catch(_){}
+        try{renderPlannerView();}catch(_){}
+        try{if(window.renderNotesView) window.renderNotesView();}catch(_){}
       }
-      if(changed) return push(true).then(function(){location.reload();});
-      applyOpen();
-    }).catch(function(){});
+      return push(true,ack).then(function(){ goTo(r.open); });
+    }).catch(function(){}).then(function(){pulling=false;});
   }
-  pull().then(function(){ready=true;return push(true);});
+  function comeBack(){ ready=false; pull().then(function(){ready=true;return push(false);}); }
+  pull().then(function(){ready=true;});
   setInterval(function(){if(ready&&!document.hidden)push(false);},3000);
   document.addEventListener('visibilitychange',function(){
-    if(document.hidden){if(ready)push(false);}
-    else{ready=false;pull().then(function(){ready=true;return push(false);});}
+    if(document.hidden){if(ready)push(false);} else comeBack();
   });
+  document.addEventListener('resume',comeBack);
+  window.addEventListener('focus',function(){ if(ready&&!pulling) comeBack(); });
+})();
+</script>
+<style id="v23-swipe">
+@keyframes statsSwL{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes statsSwR{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+.stats-sub.sw-l{animation:statsSwL .26s ease-out}
+.stats-sub.sw-r{animation:statsSwR .26s ease-out}
+@media (prefers-reduced-motion:reduce){.stats-sub.sw-l,.stats-sub.sw-r{animation:none}}
+</style>
+<script>
+/* Stats: swipe sideways to move between Overview / Week / Month / Year */
+(function(){
+  var panel=document.getElementById('panel-analytics'); if(!panel) return;
+  var ORDER=['overview','week','month','year'];
+  var x0=0,y0=0,t0=0,ok=false;
+  function hscroll(el){
+    while(el&&el!==panel){
+      if(el.scrollWidth>el.clientWidth+4){var ox=getComputedStyle(el).overflowX; if(ox==='auto'||ox==='scroll') return true;}
+      el=el.parentElement;
+    }
+    return false;
+  }
+  panel.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1){ok=false;return;}
+    var t=e.touches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+    ok=x0>24&&x0<window.innerWidth-24&&!hscroll(e.target);   /* leave the screen edges to Android's back gesture */
+  },{passive:true});
+  panel.addEventListener('touchend',function(e){
+    if(!ok) return; ok=false;
+    var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Date.now()-t0>700||Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6) return;
+    var i=ORDER.indexOf(statsSub), n=i+(dx<0?1:-1);
+    if(i<0||n<0||n>=ORDER.length) return;
+    setStatsSub(ORDER[n]);
+    var el=document.getElementById('stats-sub-'+ORDER[n]);
+    if(el){el.classList.remove('sw-l','sw-r'); void el.offsetWidth; el.classList.add(dx<0?'sw-l':'sw-r');}
+  },{passive:true});
 })();
 </script>
 </body>
