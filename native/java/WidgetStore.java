@@ -67,11 +67,7 @@ public final class WidgetStore {
 
     private static JSONObject tempNote(JSONObject a) throws Exception {
         String t = a.optString("t"), b = a.optString("b");
-        if (t.isEmpty()) {
-            String[] ln = b.split("\n", 2);
-            t = ln[0];
-            b = ln.length > 1 ? ln[1] : "";
-        }
+        if (t.isEmpty()) { t = b.split("\n")[0]; b = ""; }
         return new JSONObject().put("id", a.optString("id")).put("t", t).put("b", b);
     }
 
@@ -149,7 +145,7 @@ public final class WidgetStore {
         for (int id : rids) m.updateAppWidget(id, RoutineWidget.build(c));
         if (rids.length > 0) m.notifyAppWidgetViewDataChanged(rids, R.id.rlist);
         int[] nids = m.getAppWidgetIds(new ComponentName(c, NotesWidget.class));
-        for (int id : nids) m.updateAppWidget(id, NotesWidget.build(c, id));
+        for (int id : nids) m.updateAppWidget(id, NotesWidget.build(c));
         if (nids.length > 0) m.notifyAppWidgetViewDataChanged(nids, R.id.nlist);
         int[] tids = m.getAppWidgetIds(new ComponentName(c, TodoWidget.class));
         for (int id : tids) m.updateAppWidget(id, TodoWidget.build(c));

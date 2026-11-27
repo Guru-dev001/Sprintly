@@ -1,6 +1,6 @@
 # Sprintly - build the signed Android update from GitHub
 
-This repo contains the Sprintly v19 app plus two home-screen widgets (Today's routine 3x2, Notes 2x2).
+This repo contains the Sprintly v19 app plus three home-screen widgets (Today's Routine, Sprintly Notes 2x2 fixed size with swipe, Sprintly To-do).
 
 ## One-time setup: signing secrets (never put the key or password in the repo)
 1. On your computer, turn your key into text:
